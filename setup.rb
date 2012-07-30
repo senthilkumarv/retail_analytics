@@ -1,14 +1,22 @@
 require './state.rb'
 require './transition.rb'
+require './machine.rb'
 
 need = State.new
+no_need = State.new
 view_advertisement = State.new
 browse_products = State.new
 purchase_products = State.new
 
-browse_given_need = Transition.new(need, browse_products, 0.2)
-purchase_given_need = Transition.new(need, purchase_products, 0.2)
-purchase_given_browse = Transition.new(browse_products, purchase_products, 0.2)
-browse_given_view = Transition.new(view_advertisement, browse_products, 0.2)
-purchase_given_view = Transition.new(view_advertisement, purchase_products, 0.2)
+need.add_transition(Transition.new(browse_products, 0.2))
+need.add_transition(Transition.new(purchase_products, 0.2))
+need.add_transition(Transition.new(need, 0.2))
+no_need.add_transition(Transition.new(no_need, 0.2))
+no_need.add_transition(Transition.new(browse_products, 0.2))
+no_need.add_transition(Transition.new(purchase_products, 0.2))
+browse_products.add_transition(Transition.new(purchase_products, 0.2))
+view_advertisement.add_transition(Transition.new(view_advertisement, browse_products, 0.2))
+view_advertisement.add_transition(Transition.new(view_advertisement, purchase_products, 0.2))
+
+m = Machine.new(no_need)
 
