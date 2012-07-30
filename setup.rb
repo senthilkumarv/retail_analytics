@@ -19,4 +19,7 @@ view_advertisement.add_transition(Transition.new(view_advertisement, browse_prod
 view_advertisement.add_transition(Transition.new(view_advertisement, purchase_products, 0.2))
 
 m = Machine.new(no_need)
+while(true)
+	m.next
+end
 
