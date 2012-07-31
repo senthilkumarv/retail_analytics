@@ -30,12 +30,24 @@ class State
 #		puts transition_tables.inspect
 		index = transition_tables.keys.index {|transition| transition_tables[transition].include?(selected)}
 #		puts "Number of numbers in all sets=#{sum}, searching for #{selected}"
-		transition_tables.keys[index].to
+		{ :state => transition_tables.keys[index].to, :time => transition_tables.keys[index].time }
 	end
 
 	def to_s
 		@description
 	end
+	
+	def execute(listener, time_step)
+	end
 end
 
+class Purchase < State
+	def initialize(description)
+		super(description)
+	end
+	
+	def execute(listener, time_step)
+		listener.purchase_was_made(time_step)
+	end
+end
 
