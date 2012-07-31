@@ -17,7 +17,7 @@ class EventListener
 		@events.values.each do |evs|
 			purchase_events = purchase_events.concat(evs.select {|v| v[:event].instance_of?Purchase})
 		end
-		purchases = Array.new(900, 0)
+		purchases = Array.new(200, 0)
 		purchase_events.each {|p| purchases[p[:time].ceil] = purchases[p[:time].ceil] + 1}
 		purchases
 	end
