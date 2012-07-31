@@ -3,8 +3,8 @@ class Machine
 		@current = initial_state
 	end
 	
-	def next
-		@current = @current.next
+	def next_state
+		@current = @current.next_state
 		@current
 	end
 end
