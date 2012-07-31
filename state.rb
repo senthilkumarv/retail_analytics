@@ -1,9 +1,10 @@
 require 'set'
 
 class State
-	def initialize(description)
+	def initialize(description, time)
 		@transitions = []
 		@description = description
+		@time = time
 	end
 	
 	def add_transition(transition)
@@ -30,7 +31,7 @@ class State
 #		puts transition_tables.inspect
 		index = transition_tables.keys.index {|transition| transition_tables[transition].include?(selected)}
 #		puts "Number of numbers in all sets=#{sum}, searching for #{selected}"
-		{ :state => transition_tables.keys[index].to, :time => transition_tables.keys[index].time }
+		{ :state => transition_tables.keys[index].to, :time => @time }
 	end
 
 	def to_s
@@ -42,8 +43,8 @@ class State
 end
 
 class Purchase < State
-	def initialize(description)
-		super(description)
+	def initialize(description, time)
+		super(description, time)
 	end
 	
 	def execute(listener, time_step)

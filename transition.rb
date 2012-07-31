@@ -1,9 +1,8 @@
 class Transition
-	attr_accessor :probability, :to, :time
-	def initialize(to, probability, time)
+	attr_accessor :probability, :to
+	def initialize(to, probability)
 		@to = to
 		@probability = probability
-		@time = time
 	end
 end
 
