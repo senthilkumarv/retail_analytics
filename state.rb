@@ -37,18 +37,11 @@ class State
 	def to_s
 		@description
 	end
-	
-	def execute(listener, time_step)
-	end
 end
 
 class Purchase < State
 	def initialize(description, time)
 		super(description, time)
-	end
-	
-	def execute(listener, time_step)
-		listener.purchase_was_made(time_step)
 	end
 end
 
