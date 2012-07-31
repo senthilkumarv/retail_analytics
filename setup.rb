@@ -12,7 +12,7 @@ def run(profile, listener, machine_id)
 end
 
 listener = EventListener.new
-200.times do |x|
+500.times do |x|
 	puts "Running for customer ##{x}"
 	run(Profile.new, listener, x)
 end
