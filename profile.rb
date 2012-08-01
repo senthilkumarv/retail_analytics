@@ -9,8 +9,8 @@ end
 
 class Profile
 	def initialize
-		consume = (state) -> {state.customer_inventory.consume(30)}
-		replenish = (state) -> {state.customer_inventory.replenish(20)}
+		consume = lambda {|state| state.customer_inventory.consume(30)}
+		replenish = lambda {|state| state.customer_inventory.replenish(20)}
 		customer_stocks = CustomerStocks.new(20)
 		@need = State.new("Need", 1, customer_stocks, consume)
 		@no_need = State.new("No Need", 1, customer_stocks, consume)

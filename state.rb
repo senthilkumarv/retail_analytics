@@ -18,7 +18,7 @@ end
 
 class State
 	attr_accessor :customer_inventory
-	def initialize(description, time, customer_inventory, block = (state) -> {})
+	def initialize(description, time, customer_inventory, block = lambda{|state|})
 		@transitions = []
 		@description = description
 		@time = time
@@ -35,7 +35,7 @@ class State
 		transition_tables = {}
 		@transitions.each do |transition|
 			transition_tables[transition] = Set.new
-			times = transition.probability * 100
+			times = transition.probability(self) * 100
 			times.to_i.times do |t|
 				a = s.to_a
 				candidate = a[rand(a.length)]
@@ -56,13 +56,13 @@ class State
 	end
 	
 	def execute
-		block.call(self)
+		@block.call(self)
 	end
 end
 
 class Purchase < State
-	def initialize(description, time)
-		super(description, time)
+	def initialize(description, time, customer_inventory, block = lambda{|state|})
+		super(description, time, customer_inventory, block)
 	end
 end
 

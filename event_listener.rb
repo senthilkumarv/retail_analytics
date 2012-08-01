@@ -2,7 +2,7 @@ require './state.rb'
 
 class EventListener
 	def initialize
-		@sales = Array.new(900, 0)
+		@sales = Array.new(6000, 0)
 		@events = {}
 	end
 
@@ -17,7 +17,7 @@ class EventListener
 		@events.values.each do |evs|
 			purchase_events = purchase_events.concat(evs.select {|v| v[:event].instance_of?Purchase})
 		end
-		purchases = Array.new(600, 0)
+		purchases = Array.new(6000, 0)
 		purchase_events.each {|p| purchases[p[:time].ceil] = purchases[p[:time].ceil] + 1}
 		purchases
 	end
