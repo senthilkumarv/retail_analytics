@@ -1,10 +1,29 @@
 require 'set'
 
+class CustomerStocks
+	attr_accessor :current_level
+
+	def initialize(initial_amount)
+		@current_level = initial_amount
+	end
+	
+	def replenish(amount)
+		@current_level += amount
+	end
+	
+	def consume(amount)
+		@current_level -= amount
+	end
+end
+
 class State
-	def initialize(description, time)
+	attr_accessor :customer_inventory
+	def initialize(description, time, customer_inventory, block = (state) -> {})
 		@transitions = []
 		@description = description
 		@time = time
+		@customer_inventory = customer_inventory
+		@block = block
 	end
 	
 	def add_transition(transition)
@@ -12,7 +31,6 @@ class State
 	end
 
 	def next_state
-		sum = 0
 		s = Set.new((1..100).to_a)
 		transition_tables = {}
 		@transitions.each do |transition|
@@ -24,18 +42,21 @@ class State
 				transition_tables[transition] << candidate
 				s.delete(candidate)
 			end
-			sum += transition_tables[transition].count
 		end
 		
 		selected = rand(100) + 1
-#		puts transition_tables.inspect
 		index = transition_tables.keys.index {|transition| transition_tables[transition].include?(selected)}
-#		puts "Number of numbers in all sets=#{sum}, searching for #{selected}"
-		{ :state => transition_tables.keys[index].to, :time => @time }
+		transition = transition_tables.keys[index]
+		
+		{ :state => transition.to, :time => @time }
 	end
 
 	def to_s
 		@description
+	end
+	
+	def execute
+		block.call(self)
 	end
 end
 

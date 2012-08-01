@@ -10,8 +10,8 @@ class Machine
 		x = @current.next_state
 		@current = x[:state]
 		@time_step += x[:time]
+		@current.execute
 		@listener.log(@current, @time_step, @id)
-#		@current.execute(@listener, @time_step)
 		x
 	end
 end

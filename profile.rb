@@ -1,12 +1,24 @@
+class Product
+	attr_accessor :lifecycle, :unit_price
+
+	def initialize(lifecycle, unit_price)
+		@lifecycle = lifecycle
+		@unit_price = unit_price
+	end
+end
+
 class Profile
 	def initialize
-		@need = State.new("Need", 1)
-		@no_need = State.new("No Need", 1)
-		@view_advertisement_on_tv = State.new("View advertisement on TV", 0.3)
-		@view_advertisement_online = State.new("View advertisement online", 0.3)
-		@view_advertisement_on_radio = State.new("View advertisement on radio", 0.3)
-		@browse_products = State.new("Browse products", 2)
-		@purchase_products = Purchase.new("Purchase product", 4)
+		consume = (state) -> {state.customer_inventory.consume(30)}
+		replenish = (state) -> {state.customer_inventory.replenish(20)}
+		customer_stocks = CustomerStocks.new(20)
+		@need = State.new("Need", 1, customer_stocks, consume)
+		@no_need = State.new("No Need", 1, customer_stocks, consume)
+		@view_advertisement_on_tv = State.new("View advertisement on TV", 0.3, customer_stocks)
+		@view_advertisement_online = State.new("View advertisement online", 0.3, customer_stocks)
+		@view_advertisement_on_radio = State.new("View advertisement on radio", 0.3, customer_stocks)
+		@browse_products = State.new("Browse products", 2, customer_stocks)
+		@purchase_products = Purchase.new("Purchase product", 4, customer_stocks, replenish)
 
 		@need.add_transition(Transition.new(@no_need, 0.1))
 		@need.add_transition(Transition.new(@need, 0.1))
