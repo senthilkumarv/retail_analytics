@@ -14,8 +14,12 @@ class Customer
 end
 
 customer_frequency_distribution = {1..1 => 0.4, 2..3 => 0.2, 4..5 => 0.1, 6..10 => 0.2}
-order_value_frequency_distribution = {1..500 => 0.4, 500..2000 => 0.3, 2000..4000 => 0.2, 4000..10000 => 0.1}
+order_value_frequency_distribution = {1..500 => { :fraction_customers =>0.4, :basket_mix => []}, 
+				      501..2000 => { :fraction_customers =>0.3, :basket_mix => []}, 
+				      2001..4000 => { :fraction_customers =>0.2, :basket_mix => []}, 
+				      4001..10000 => { :fraction_customers =>0.1, :basket_mix => []}}
 recency_frequency_distribution = { 0..7 => 0.3, 8..30 => 0.5, 31..80 => 0.2}
+
 
 num_customers = 100
 
@@ -37,7 +41,7 @@ end
 
 ids = Set.new((1..num_customers).to_a)
 order_value_frequency_distribution.each_pair do |k,v|
-	frequency = (v * num_customers).to_i
+	frequency = (v[:fraction_customers] * num_customers).to_i
 	puts frequency
 	frequency.times do |f|
 		as_array = ids.to_a
@@ -68,7 +72,7 @@ recency_frequency_distribution.each_pair do |k,v|
 		selected.each do |t|
 			
 			next if (stop - t[:date] >= k.begin && stop - t[:date] <= k.end)
-			t[:date] = stop - (k.begin + k.end).to_i/2 + rand(2)
+			t[:date] = stop - (k.begin + k.end).to_i/2 + rand(4) - 2
 		end
 		ids.delete(customer_index)
 	end
