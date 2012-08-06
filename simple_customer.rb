@@ -76,7 +76,6 @@ recency_frequency_distribution.each_pair do |k,v|
 		selected = transactions.select {|t| t[:id] == customer_index}
 		
 		selected.each do |t|
-			
 			next if (stop - t[:date] >= k.begin && stop - t[:date] <= k.end)
 			t[:date] = stop - (k.begin + k.end).to_i/2 + rand(4) - 2
 		end
@@ -88,19 +87,9 @@ handle = File.open("op.csv", "w")
 handle.puts("CustomerID, OrderValue, Date, TransactionID, ProductID, Quantity")
 transactions.each do |t|
 	t[:basket].each do |mix|
-		handle.puts("#{t[:id]}, #{t[:value]}, #{t[:date]}, #{t[:transaction_id]}, #{mix[:product_id]}, #{mix[:quantity]}")
+		handle.puts("#{t[:id]}, #{t[:value]/t[:basket].length}, #{t[:date]}, #{t[:transaction_id]}, #{mix[:product_id]}, #{mix[:quantity]}")
 	end
 end
 
 handle.close
-
-
-#ts = transactions.select {|t| t[:id] == 2}
-#sum = 0
-#ts.each do |t|
-#	puts t
-#	sum += t[:value]
-#end
-#puts sum/ts.length
-##puts transactions.inspect
 
