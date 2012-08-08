@@ -116,13 +116,16 @@ end
 handle = File.open("op.csv", "w")
 handle.puts("CustomerID, OrderValue, Date, TransactionID, ProductID, Quantity")
 
+db.execute( "delete from spree_orders")
+db.execute( "delete from spree_line_items")
 transactions.each do |t|
 	db.execute( "insert into spree_orders (id, item_total, total, user_id, payment_total, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?)", t[:transaction_id], t[:value], t[:value], t[:id], t[:value], t[:date].to_s, t[:date].to_s)
 end
 
 transactions.each do |t|
 	t[:basket].each do |mix|
-		handle.puts("#{t[:id]}, #{t[:value]/t[:basket].length}, #{t[:date]}, #{t[:transaction_id]}, #{mix[:product][:id]}, #{mix[:quantity]}")
+	db.execute( "insert into spree_line_items (order_id, variant_id, quantity, price, created_at, updated_at) values (?, ?, ?, ?, ?, ?)", t[:transaction_id], mix[:product][:variant_id], mix[:quantity], mix[:product][:price], t[:date].to_s, t[:date].to_s)
+		handle.puts("#{t[:transaction_id]}, #{t[:value]/t[:basket].length}, #{t[:date]}, #{t[:transaction_id]}, #{mix[:product][:id]}, #{mix[:quantity]}")
 	end
 end
 
