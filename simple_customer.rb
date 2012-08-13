@@ -20,7 +20,9 @@ def users(db)
 end
 
 def value(basket)
-	basket.inject {|sum, i| sum + i[:product][:price]}
+	sum = 0
+	basket.each {|i| sum += i[:product][:price]}
+	sum
 end
 
 db = SQLite3::Database.new( "/home/avishek/Code/mystore/db/development.sqlite3" )
@@ -29,7 +31,7 @@ phone = by_description("Zen Full Touch Dual Sim Phone - M28", db)
 sdcard = by_description("Sandisk 32 GB Micro SD Ultra Card (Class 10)", db)
 s3 = by_description("Samsung Galaxy S3 i9300 Mobile Phone - 16GB", db)
 linen_kurta = by_description("Fab India Linen Kurta", db)
-red_kurta = by_description("Fab India Kurta", db)
+red_kurta = by_description("Fab India Red Kurta", db)
 bracelet = by_description("Multicoloured Bracelet", db)
 watch = by_description("Croco Pattern Leather Strap Watch", db)
 tikkis = by_description("Kebabs & Tikkis - Tarla Dalal", db)
