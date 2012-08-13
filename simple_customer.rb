@@ -19,19 +19,23 @@ def users(db)
 	row = db.execute("select id from spree_users").map {|c| c[0]}
 end
 
+def value(basket)
+	basket.inject {|sum, i| sum + i[:product][:price]}
+end
+
 db = SQLite3::Database.new( "/home/avishek/Code/mystore/db/development.sqlite3" )
 
 phone = by_description("Zen Full Touch Dual Sim Phone - M28", db)
 sdcard = by_description("Sandisk 32 GB Micro SD Ultra Card (Class 10)", db)
 s3 = by_description("Samsung Galaxy S3 i9300 Mobile Phone - 16GB", db)
-kurti = by_description("De Marca Kurti Code - 1009b", db)
-lehenga = by_description("Designer Red Lehenga by Aakriti", db)
-bracelet = by_description("The Pari Multicoloured Bracelet - Sdbr-23", db)
-watch = by_description("Joan Rivers Shimmering Croco Pattern Leather Strap Watch", db)
+linen_kurta = by_description("Fab India Linen Kurta", db)
+red_kurta = by_description("Fab India Kurta", db)
+bracelet = by_description("Multicoloured Bracelet", db)
+watch = by_description("Croco Pattern Leather Strap Watch", db)
 tikkis = by_description("Kebabs & Tikkis - Tarla Dalal", db)
-skewers = by_description("Fox Run Brands Bamboo Skewers, 6-Inch", db)
+kitchen_set = by_description("Kitchen Linen Set", db)
 biography = by_description("Steve Jobs: The Exclusive Biography", db)
-
+ring = by_description("Ring", db)
 
 customers = users(db)
 #puts customers.inspect
@@ -47,10 +51,10 @@ customers = users(db)
 #puts biography.inspect
 
 customer_frequency_distribution = {1..1 => 0.4, 2..3 => 0.2, 4..5 => 0.1, 6..10 => 0.2}
-order_value_frequency_distribution = {1..500 => { :fraction_customers =>0.4, :basket_mix => [p(phone,4), p(sdcard,5)]}, 
-				      501..2000 => { :fraction_customers =>0.3, :basket_mix => [p(kurti,4), p(bracelet,5)]}, 
-				      2001..4000 => { :fraction_customers =>0.2, :basket_mix => [p(s3,4), p(sdcard,5)]}, 
-				      4001..10000 => { :fraction_customers =>0.1, :basket_mix => [p(biography,4)]}}
+order_value_frequency_distribution = {1..500 => { :fraction_customers =>0.4, :basket_mix => [[p(ring,1)], [p(bracelet,1)], [p(ring,1), p(bracelet,1)]]}, 
+				      501..2000 => { :fraction_customers =>0.3, :basket_mix => [[p(kitchen_set,1)], [p(tikkis,1)], [p(biography,1), p(ring, 1)]]}, 
+				      2001..4000 => { :fraction_customers =>0.2, :basket_mix => [[p(sdcard,1), p(biography,1)], [p(watch,1), p(kitchen_set,1)], [p(linen_kurta,1), p(bracelet,1)]]}, 
+				      4001..10000 => { :fraction_customers =>0.1, :basket_mix => [[p(linen_kurta,1), p(bracelet,1), p(watch,1)], [p(red_kurta,1), p(ring,1)], [p(s3, 1)]]}}
 recency_frequency_distribution = { 0..7 => 0.3, 8..30 => 0.5, 31..80 => 0.2}
 
 customers = customers[0..99]
@@ -82,8 +86,9 @@ order_value_frequency_distribution.each_pair do |k,v|
 		customer_index = as_array[rand(as_array.length).to_i]
 		selected = transactions.select {|t| t[:id] == customer_index}
 		selected.each do |t|
-			t[:value] = (rand(k.end - k.begin) + k.begin).to_i
-			t[:basket] = v[:basket_mix]
+			t[:basket] = v[:basket_mix][rand(v[:basket_mix].length)]
+#			t[:value] = (rand(k.end - k.begin) + k.begin).to_i
+			t[:value] = value(t[:basket])
 		end
 		ids.delete(customer_index)
 	end
@@ -119,7 +124,7 @@ handle.puts("CustomerID, OrderValue, Date, TransactionID, ProductID, Quantity")
 db.execute( "delete from spree_orders")
 db.execute( "delete from spree_line_items")
 transactions.each do |t|
-	db.execute( "insert into spree_orders (id, item_total, total, user_id, payment_total, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?)", t[:transaction_id], t[:value], t[:value], t[:id], t[:value], t[:date].to_s, t[:date].to_s)
+	db.execute( "insert into spree_orders (id, item_total, total, user_id, payment_total, created_at, updated_at, state) values (?, ?, ?, ?, ?, ?, ?, ?)", t[:transaction_id], t[:value], t[:value], t[:id], t[:value], t[:date].to_s, t[:date].to_s, "complete")
 end
 
 transactions.each do |t|
