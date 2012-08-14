@@ -40,18 +40,6 @@ biography = by_description("Steve Jobs: The Exclusive Biography", db)
 ring = by_description("Ring", db)
 
 customers = users(db)
-#puts customers.inspect
-#puts phone.inspect
-#puts sdcard.inspect
-#puts s3.inspect
-#puts kurti.inspect
-#puts lehenga.inspect
-#puts bracelet.inspect
-#puts watch.inspect
-#puts tikkis.inspect
-#puts skewers.inspect
-#puts biography.inspect
-
 customer_frequency_distribution = {1..1 => 0.4, 2..3 => 0.2, 4..5 => 0.1, 6..10 => 0.2}
 order_value_frequency_distribution = {1..500 => { :fraction_customers =>0.4, :basket_mix => [[p(ring,1)], [p(bracelet,1)], [p(ring,1), p(bracelet,1)]]}, 
 				      501..2000 => { :fraction_customers =>0.3, :basket_mix => [[p(kitchen_set,1)], [p(tikkis,1)], [p(biography,1), p(ring, 1)]]}, 
@@ -59,8 +47,8 @@ order_value_frequency_distribution = {1..500 => { :fraction_customers =>0.4, :ba
 				      4001..10000 => { :fraction_customers =>0.1, :basket_mix => [[p(linen_kurta,1), p(bracelet,1), p(watch,1)], [p(red_kurta,1), p(ring,1)], [p(s3, 1)]]}}
 recency_frequency_distribution = { 0..7 => 0.3, 8..30 => 0.5, 31..80 => 0.2}
 
-customers = customers[0..99]
-num_customers = customers.length
+num_customers = 100
+customers = customers[0..(num_customers - 1)]
 
 ids = Set.new(customers)
 transactions = []
@@ -89,7 +77,6 @@ order_value_frequency_distribution.each_pair do |k,v|
 		selected = transactions.select {|t| t[:id] == customer_index}
 		selected.each do |t|
 			t[:basket] = v[:basket_mix][rand(v[:basket_mix].length)]
-#			t[:value] = (rand(k.end - k.begin) + k.begin).to_i
 			t[:value] = value(t[:basket])
 		end
 		ids.delete(customer_index)
