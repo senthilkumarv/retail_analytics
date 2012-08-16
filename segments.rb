@@ -27,8 +27,10 @@ tikkis = by_description("Kebabs & Tikkis - Tarla Dalal", db)
 kitchen_set = by_description("Kitchen Linen Set", db)
 biography = by_description("Steve Jobs: The Exclusive Biography", db)
 ring = by_description("Ring", db)
+tshirt = by_description("Ring", db)
+cap = by_description("T shirt", db)
 
-products = [phone, sdcard, s3, linen_kurta, red_kurta, bracelet, watch, tikkis, kitchen_set, biography, ring]
+products = [phone, sdcard, s3, linen_kurta, red_kurta, bracelet, watch, tikkis, kitchen_set, biography, ring, tshirt, cap]
 
 db_orders = db.execute("select total, user_id, created_at, id from spree_orders")
 orders = db_orders.map {|o| {:user_id => o[1], :order_value => o[0], :date => o[2], :id => o[3]}}
