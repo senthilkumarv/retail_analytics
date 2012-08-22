@@ -13,7 +13,7 @@ def users(db)
 	row = db.execute("select id from spree_users").map {|c| c[0]}
 end
 
-db = SQLite3::Database.new( "/home/avishek/Code/mystore/db/development.sqlite3" )
+db = SQLite3::Database.new( "/.datastore/dev.sqlite3" )
 
 phone = by_description("Zen Full Touch Dual Sim Phone - M28", db)
 sdcard = by_description("Sandisk 32 GB Micro SD Ultra Card (Class 10)", db)
