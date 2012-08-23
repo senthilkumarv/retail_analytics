@@ -86,8 +86,8 @@ order_value_frequency_distribution.each_pair do |k,v|
 end
 
 
-start = Date.new(2001, 1, 1)
-stop = Date.new(2001, 4, 1)
+start = Date.new(2012, 5, 1)
+stop = Date.new(2012, 8, 1)
 
 transactions.each do |t|
 	t[:date] = start + rand((stop - start).to_i)
