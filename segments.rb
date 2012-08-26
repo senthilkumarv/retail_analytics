@@ -46,14 +46,14 @@ users = db_users.map {|u| {:user_id => u[0]}}
 num_users = 100
 users = users[0..(num_users - 1)]
 
-customer_frequency_distribution = {1..1 => 0, 2..3 => 0, 4..5 => 0, 6..10 => 0}
+customer_frequency_distribution = {1..1 => 0.4, 2..3 => 0.2, 4..5 => 0.1, 6..10 => 0.2}
 customer_frequencywise_transaction_buckets = {1..1 => [], 2..3 => [], 4..5 => [], 6..10 => []}
 customer_frequencywise_product_distribution = {1..1 => {}, 2..3 => {}, 4..5 => {}, 6..10 => {}}
 
-order_value_frequency_distribution = {1..500 => 0, 
-				      501..2000 => 0, 
-				      2001..4000 => 0, 
-				      4001..10000 => 0
+order_value_frequency_distribution = {1..500 => 0.4, 
+				      501..2000 => 0.3, 
+				      2001..4000 => 0.2, 
+				      4001..10000 => 0.1
 				     }
 order_valuewise_transaction_buckets = {1..500 => [], 
 				      501..2000 => [], 
@@ -66,7 +66,7 @@ order_valuewise_product_distribution = {1..500 => {},
 				      4001..10000 => {}
 				     }
 
-recency_frequency_distribution = { 0..7 => 0, 8..30 => 0, 31..80 => 0}
+recency_frequency_distribution = { 0..7 => 0.3, 8..30 => 0.5, 31..80 => 0.1}
 
 
 transactions = users.map {|u| {:user_id => u[:user_id], :transactions => orders.select {|o| o[:user_id] == u[:user_id]}}}
@@ -110,7 +110,7 @@ sorted_ranges.each do |r|
 	labels[index] = r.to_s
 	index += 1
 end
-
+puts "Sorted Values of transaction_frequency #{sorted_values} Labels #{labels}"
 g = Gruff::Bar.new
 g.title = "Transaction Frequency" 
 g.data("Customers", sorted_values)
@@ -164,11 +164,11 @@ sorted_ranges.each do |r|
 	index += 1
 end
 
-g = Gruff::Bar.new
-g.title = "Order Value Distribution" 
-g.data("Customers", sorted_values)
-g.labels = labels
-g.write('order_value_distribution.png')
+#g = Gruff::Bar.new
+#g.title = "Order Value Distribution" 
+#g.data("Customers", sorted_values)
+#g.labels = labels
+#g.write('order_value_distribution.png')
 
 start = Date.new(2001, 1, 1)
 stop = Date.new(2001, 4, 1)
@@ -203,9 +203,9 @@ sorted_ranges.each do |r|
 	index += 1
 end
 
-g = Gruff::Bar.new
-g.title = "Order Recency Distribution" 
-g.data("Customers", sorted_values)
-g.labels = labels
-g.write('order_recency_distribution.png')
+#g = Gruff::Bar.new
+#g.title = "Order Recency Distribution" 
+#g.data("Customers", sorted_values)
+#g.labels = labels
+#g.write('order_recency_distribution.png')
 
