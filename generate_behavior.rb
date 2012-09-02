@@ -3,7 +3,6 @@ require_relative 'spree_repository'
 require_relative 'behavior_generator'
 require 'uuid'
 
-
 db = SQLite3::Database.new( "/.datastore/dev.sqlite3" )
 
 repository = SpreeRepository.new db
@@ -22,9 +21,31 @@ def generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
   }
 end
 
-def generate_random_search_behavior_for_users(repository, uuid_generator, orders)
-  customers = repository.random_customers 30
-  
+def generate_random_search_behavior_for_users(repository, uuid_generator, no_of_customers)
+  customers = repository.random_customers no_of_customers
+  customers.each { |customer|
+    no_of_search = Random.rand(1..10)
+    no_of_search.times { 
+      product = repository.select_random_product_variant
+      order = {:session => uuid_generator.generate, :user => customer[0]}
+      behavior_generator = BehaviorGenerator.new(repository, order)
+      behavior_generator.search_for_product({:id => product[0]})
+    }
+  }
 end
+
+def generate_substitution_behavior_for_users(repository)
+  customers = repository.customers_who_bought_variants_of_a_product 10
+  customers.each { |customer|
+    session = repository.session_id_for_order(customer[0])[0]
+    order = {:session => session[0], :order => customer[0], :user => customer[1], :product => customer[2], :quantity => customer[3]}
+    behavior_generator = BehaviorGenerator.new(repository, order)
+    behavior_generator.search_for_unavailable_product_and_add_to_cart(order)
+  }
+
+end
+
+generate_substitution_behavior_for_users(repository)
+#generate_random_search_behavior_for_users(repository, uuid_generator, 30)
 #products = db.execute("select id from spree_products").map {|p| p[0]}
 #users = db.execute("select id from spree_users").map {|u| u[0]}
