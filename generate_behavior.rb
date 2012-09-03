@@ -40,7 +40,8 @@ def generate_substitution_behavior_for_users(repository, uuid_generator)
   customers = repository.customers_who_bought_variants_of_a_product 10
   customers.each { |customer|
     variant = repository.variant_of_a_product(customer[2])
-    order = {:session => uuid_generator.generate, :order => customer[0], :user => customer[1], :product => variant[0][0], :quantity => customer[3]}
+    puts "V: #{variant[0][0]}"
+    order = {:session => uuid_generator.generate, :order => customer[0], :user => customer[1], :id => variant[0][0], :quantity => customer[3]}
     behavior_generator = BehaviorGenerator.new(repository, order)
     behavior_generator.search_for_unavailable_product_and_add_to_cart(order)
   }
