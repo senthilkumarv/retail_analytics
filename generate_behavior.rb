@@ -3,7 +3,7 @@ require_relative 'spree_repository'
 require_relative 'behavior_generator'
 require 'uuid'
 
-db = SQLite3::Database.new( "/.datastore/dev.sqlite3" )
+db = SQLite3::Database.new( "dev.sqlite3" )
 
 repository = SpreeRepository.new db
 uuid_generator = UUID.new
