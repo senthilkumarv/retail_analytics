@@ -15,7 +15,9 @@ def generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
   }
 
   purchases.each { |purchase|
-    purchase[:session] = uuid_generator.generate
+    session = repository.session_id_for_substitution(purchase[:user])
+    session = uuid_generator.generate unless session.any?
+    purchase[:session] = session
     generator = BehaviorGenerator.new(repository, purchase)
     generator.make_purchase_of_searched_product
   }
@@ -34,18 +36,19 @@ def generate_random_search_behavior_for_users(repository, uuid_generator, no_of_
   }
 end
 
-def generate_substitution_behavior_for_users(repository)
+def generate_substitution_behavior_for_users(repository, uuid_generator)
   customers = repository.customers_who_bought_variants_of_a_product 10
   customers.each { |customer|
-    session = repository.session_id_for_order(customer[0])[0]
-    order = {:session => session[0], :order => customer[0], :user => customer[1], :product => customer[2], :quantity => customer[3]}
+    variant = repository.variant_of_a_product(customer[2])
+    order = {:session => uuid_generator.generate, :order => customer[0], :user => customer[1], :product => variant[0][0], :quantity => customer[3]}
     behavior_generator = BehaviorGenerator.new(repository, order)
     behavior_generator.search_for_unavailable_product_and_add_to_cart(order)
   }
 
 end
 
-generate_substitution_behavior_for_users(repository)
-#generate_random_search_behavior_for_users(repository, uuid_generator, 30)
-#products = db.execute("select id from spree_products").map {|p| p[0]}
-#users = db.execute("select id from spree_users").map {|u| u[0]}
+db.execute("delete from spree_user_behaviors")
+generate_random_search_behavior_for_users(repository, uuid_generator, 30)
+generate_substitution_behavior_for_users(repository, uuid_generator)
+generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
+

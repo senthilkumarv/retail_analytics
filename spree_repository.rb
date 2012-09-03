@@ -7,7 +7,7 @@ class SpreeRepository
   end
 
   def add_to_cart(options)
-    @connection.execute("insert into spree_user_behaviors(Session_ID, User_ID, action, created_at, parameters) values(?, ?, ?, datetime(), ?)", options[:session], options[:user], "AC", "{'product': #{options[:prodcut]}, 'availability': #{options[:availability]}, 'quantity': #{options[:quantity]}}")
+    @connection.execute("insert into spree_user_behaviors(Session_ID, User_ID, action, created_at, parameters) values(?, ?, ?, datetime(), ?)", options[:session], options[:user], "AC", "{'product': #{options[:product]}, 'availability': #{options[:availability]}, 'quantity': #{options[:quantity]}}")
   end
 
   def delete_from_cart(options)
@@ -38,7 +38,11 @@ class SpreeRepository
     @connection.execute("select li.order_id, o.user_id, li.variant_id, li.quantity from spree_line_items li, spree_orders o where li.order_id = o.id and variant_id in (select id from spree_variants where product_id in (select product_id from spree_variants group by product_id having count(*) > 1)) order by RANDOM() limit #{number}")
   end
   
-  def session_id_for_order(order)
-    @connection.execute("select session_id from spree_user_behaviors where parameters like '%#{order}%' limit 1")
+  def variant_of_a_product(variant)
+    @connection.execute("select id from spree_variants where id <> #{variant} and product_id in (select product_id from spree_variants where id=#{variant}) limit 1")
+  end
+
+  def session_id_for_substitution(user_id)
+    @connection.execute("select session_id from (select session_id, parameters from spree_user_behaviors where user_id like '%#{user_id}%' and action='AC' order by id desc limit 1) where parameters like '%false%'")
   end
 end

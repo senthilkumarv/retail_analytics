@@ -27,6 +27,6 @@ class BehaviorGenerator
 
   def search_for_product_and_add_to_cart(item, availability)
     search_for_product(item)
-    @repository.add_to_cart({:session => @order[:session], :user => @order[:user], :product => item[:id], :quantity => item[:quantity]})
+    @repository.add_to_cart({:session => @order[:session], :user => @order[:user], :product => item[:id], :quantity => item[:quantity], :availability => availability})
   end
 end
