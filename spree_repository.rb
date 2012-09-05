@@ -57,4 +57,14 @@ class SpreeRepository
   def category_for_a_variant(variant)
     @connection.execute("select id from spree_taxons where taxonomy_id='854451430' and id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=#{variant}))")
   end
+
+  def product_searched_and_bought
+    @connection.execute("select buying.session_id, search.variant_id, buying.variant_id from (select b.session_id as session_id, li.variant_id as variant_id from spree_line_items li, spree_user_behaviors b where li.order_id=replace(substr(b.parameters, 10, 5), '}', '') and action='P') as buying, (select session_id, replace(substr(parameters, 12, 20), '}', '') as variant_id from spree_user_behaviors where action='S') as search where buying.session_id = search.session_id and buying.variant_id <> search.variant_id")
+  end
+
+  def persist_substitution_behavior(substitutions)
+    substitutions.each { |substitution|
+      @connection.execute("insert into substitution_behavior values(?, ?, ?)", substitution[:searched], substitution[:bought], substitution[:session])
+    }
+  end
 end
