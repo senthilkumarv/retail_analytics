@@ -43,7 +43,7 @@ class SpreeRepository
   end
   
   def variant_of_a_product(variant)
-    @connection.execute("select id from spree_variants where id <> #{variant} and product_id in (select product_id from spree_variants where id=#{variant}) limit 1")
+    @connection.execute("select id from spree_variants where id <> #{variant} and product_id in (select product_id from spree_products_taxons where taxon_id  in(select id from spree_taxons where id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=#{variant})) and taxonomy_id='854451430')) limit 1")
   end
 
   def session_id_for_substitution(user_id)
@@ -52,5 +52,9 @@ class SpreeRepository
   
   def group_by_product_views
     @connection.execute("select parameters,count(parameters) from spree_user_behaviors where action = 'S' group by parameters")
+  end
+
+  def category_for_a_variant(variant)
+    @connection.execute("select id from spree_taxons where taxonomy_id='854451430' and id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=#{variant}))")
   end
 end
