@@ -1,7 +1,9 @@
+require 'rubygems'
 require 'sqlite3'
-require_relative 'spree_repository'
-require_relative 'behavior_generator'
+require './spree_repository'
+require './behavior_generator'
 require 'uuid'
+require 'json'
 
 db = SQLite3::Database.new( "dev.sqlite3" )
 
@@ -31,7 +33,7 @@ def generate_random_search_behavior_for_users(repository, uuid_generator, no_of_
       product = repository.select_random_product_variant
       order = {:session => uuid_generator.generate, :user => customer[0]}
       behavior_generator = BehaviorGenerator.new(repository, order)
-      behavior_generator.search_for_product({:id => product[0]})
+      behavior_generator.search_for_product({:id => product[0][0]})
     }
   }
 end
@@ -47,8 +49,18 @@ def generate_substitution_behavior_for_users(repository, uuid_generator)
 
 end
 
+def aggregate_product_views(repository)  
+  results = repository.group_by_product_views  
+  results.each { |row| 
+    variant  = JSON.parse(row[0])["product"]
+    repository.add_to_product_views(variant,row[1])
+  }
+end
+
+db.execute("delete from product_views")
 db.execute("delete from spree_user_behaviors")
 generate_random_search_behavior_for_users(repository, uuid_generator, 30)
 generate_substitution_behavior_for_users(repository, uuid_generator)
 generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
+aggregate_product_views(repository)
 

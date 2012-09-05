@@ -1,0 +1,4 @@
+spree_user_behaviors
+	action
+	session_id
+	
