@@ -70,7 +70,6 @@ class SpreeRepository
 
   def variant_bought_in_session?(session, variant)
     variants = @connection.execute("select variant_id from spree_line_items where order_id in (select replace(substr(parameters, 10, 5), '}', '') from spree_user_behaviors where action = 'P' and session_id=?) and variant_id=?", session, variant)
-    puts "Session: #{session} Variant: #{variant} Variants: #{variants} #{variants.any?}"
     variants.any?
   end
 end
