@@ -63,14 +63,15 @@ def find_people_who_searched_and_bought_same_category(repository)
   behavior.each { |b|
     searched_category = repository.category_for_a_variant(b[1])[0][0]
     bought_category = repository.category_for_a_variant(b[2])[0][0]
-    valid_substitutions << {:searched => b[1], :bought => b[2], :session => b[0]} if(searched_category == bought_category)  
+    valid_substitutions << {:searched => b[1], :bought => b[2], :session => b[0]} if(!repository.variant_bought_in_session?(b[0], b[1]) && (searched_category == bought_category)) 
   }
-  valid_substitutions
+  
   repository.persist_substitution_behavior(valid_substitutions)
 end
 
 db.execute("delete from product_views")
 db.execute("delete from spree_user_behaviors")
+db.execute("delete from substitution_behavior")
 generate_random_search_behavior_for_users(repository, uuid_generator, 30)
 generate_substitution_behavior_for_users(repository, uuid_generator)
 generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
