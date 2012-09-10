@@ -39,7 +39,7 @@ def generate_random_search_behavior_for_users(repository, uuid_generator, no_of_
 end
 
 def generate_substitution_behavior_for_users(repository, uuid_generator)
-  customers = repository.customers_who_bought_variants_of_a_product 10
+  customers = repository.customers_who_bought_variants_of_a_product 20
   customers.each { |customer|
     variant = repository.variant_of_a_product(customer[2])
     order = {:session => uuid_generator.generate, :order => customer[0], :user => customer[1], :id => variant[0][0], :quantity => customer[3]}

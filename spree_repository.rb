@@ -31,7 +31,7 @@ class SpreeRepository
   end
 
   def select_random_product_variant
-    @connection.execute("SELECT id FROM spree_variants ORDER BY RANDOM() LIMIT 1")
+    @connection.execute("SELECT id FROM spree_variants where is_master='t' ORDER BY RANDOM() LIMIT 1")
   end
 
   def orders
@@ -39,11 +39,11 @@ class SpreeRepository
   end
 
   def customers_who_bought_variants_of_a_product(number)
-    @connection.execute("select li.order_id, o.user_id, li.variant_id, li.quantity from spree_line_items li, spree_orders o where li.order_id = o.id and variant_id in (select id from spree_variants where product_id in (select product_id from spree_variants group by product_id having count(*) > 1)) order by RANDOM() limit #{number}")
+    @connection.execute("select li.order_id, o.user_id, li.variant_id, li.quantity from spree_line_items li, spree_orders o where o.id=li.order_id and variant_id in(select distinct v.id from spree_variants as v where exists(select id from spree_variants where id <> v.id and product_id in (select product_id from spree_products_taxons where taxon_id  in(select id from spree_taxons where id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=v.id)) and taxonomy_id='854451430')))) order by RANDOM() limit #{number}")
   end
   
   def variant_of_a_product(variant)
-    @connection.execute("select id from spree_variants where id <> #{variant} and product_id in (select product_id from spree_products_taxons where taxon_id  in(select id from spree_taxons where id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=#{variant})) and taxonomy_id='854451430')) limit 1")
+    @connection.execute("select id from spree_variants where id <> #{variant} and is_master='t' and product_id in (select product_id from spree_products_taxons where taxon_id  in(select id from spree_taxons where id in (select taxon_id from spree_products_taxons where product_id in (select product_id from spree_variants where id=#{variant})) and taxonomy_id='854451430')) limit 1")
   end
 
   def session_id_for_substitution(user_id)
