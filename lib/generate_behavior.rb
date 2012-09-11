@@ -2,10 +2,11 @@ require 'rubygems'
 require 'sqlite3'
 require './spree_repository'
 require './behavior_generator'
+require './database'
 require 'uuid'
 require 'json'
 
-db = SQLite3::Database.new( "dev.sqlite3" )
+db = Database.create
 
 repository = SpreeRepository.new db
 uuid_generator = UUID.new

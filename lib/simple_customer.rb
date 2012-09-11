@@ -1,6 +1,7 @@
 require 'set'
 require 'date'
 require 'sqlite3'
+require './database'
 
 def p(product, quantity)
 	{:product => product, :quantity => quantity}
@@ -25,7 +26,7 @@ def value(basket)
 	sum
 end
 
-db = SQLite3::Database.new( "dev.sqlite3" )
+db = Database.create
 
 phone = by_description("Zen Full Touch Dual Sim Phone - M28", db)
 sdcard = by_description("Sandisk 32 GB Micro SD Ultra Card (Class 10)", db)
