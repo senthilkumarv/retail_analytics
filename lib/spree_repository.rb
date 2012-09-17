@@ -1,3 +1,6 @@
+require './database'
+require 'sqlite3'
+
 class SpreeRepository
     def self.create
         new(Database.create)
@@ -63,7 +66,15 @@ class SpreeRepository
     end
 
     def product_searched_and_bought
-        @connection.execute("select buying.session_id, search.variant_id, buying.variant_id from (select b.session_id as session_id, li.variant_id as variant_id from spree_line_items li, spree_user_behaviors b where li.order_id=replace(substr(b.parameters, 10, 5), '}', '') and action='P') as buying, (select session_id, replace(substr(parameters, 12, 20), '}', '') as variant_id from spree_user_behaviors where action='S') as search where buying.session_id = search.session_id and buying.variant_id <> search.variant_id")
+        query = <<-HERE
+              select buying.session_id, trim(search.variant_id), buying.variant_id
+              from (select b.session_id as session_id, li.variant_id as variant_id
+                      from spree_line_items li, spree_user_behaviors b
+                      where li.order_id=replace(substr(b.parameters, 10, 5), '}', '') and action='P') as buying,
+                            (select session_id, replace(substr(parameters, 12, 20), '}', '') as variant_id from spree_user_behaviors where action='S') as search
+                                                    where buying.session_id = search.session_id and buying.variant_id <> search.variant_id
+        HERE
+        @connection.execute(query)
     end
 
     def persist_substitution_behavior(substitutions)
@@ -75,5 +86,53 @@ class SpreeRepository
     def variant_bought_in_session?(session, variant)
         variants = @connection.execute("select variant_id from spree_line_items where order_id in (select replace(substr(parameters, 10, 5), '}', '') from spree_user_behaviors where action = 'P' and session_id=?) and variant_id=?", session, variant)
         variants.any?
+    end
+
+    def delete_all_product_views
+        @connection.execute("delete from product_views")
+    end
+
+    def delete_all_user_behaviors
+        @connection.execute("delete from spree_user_behaviors")
+    end
+
+    def delete_all_substitution_behaviors
+        @connection.execute("delete from substitution_behavior")
+    end
+
+    def all_variants
+        @connection.execute("select id from spree_variants").map {|record| record.first }
+    end
+
+    def persist_substitutions(substitutions)
+        substitutions.each do |substitution|
+            insert_substitution = "insert into spree_substitutions(looked_up_variant, substitute_variant, probability) values (#{substitution.looked_up_variant}, #{substitution.substitute_variant}, #{substitution.probability})"
+            @connection.execute(insert_substitution)
+        end
+    end
+
+    def total_number_of_variants
+        @connection.execute("select count(*) from spree_variants")[0][0]
+    end
+
+    def number_of_variants_purchased
+        @connection.execute("select count(*) from spree_user_behaviors where action = 'P'")[0][0]
+    end
+
+    def number_of_variants_looked_at
+        @connection.execute("select count(*) from spree_user_behaviors where action = 'S'")[0][0]
+    end
+
+    def substitution_count(looked_up_variant, substitute_variant)
+        @connection.execute("select count(*) from substitution_behavior where looked_for_variant = '#{looked_up_variant}' and bought_variant = '#{substitute_variant}'")[0][0]
+    end
+
+    def purchase_count(variant)
+        query = "select count(*) from spree_line_items li inner join spree_user_behaviors ub on ub.parameters = '{\"order\": ' || li.order_id || '}' and ub.action = 'P' and li.variant_id = #{variant}"
+        @connection.execute(query)[0][0]
+    end
+
+    def lookup_count(variant)
+        @connection.execute("select count(*) from spree_user_behaviors where parameters = '{\"product\": ' || #{variant} || '}' and action = 'S'")[0][0]
     end
 end

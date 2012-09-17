@@ -110,7 +110,7 @@ recency_frequency_distribution.each_pair do |k,v|
 	end
 end
 
-handle = File.open("op.csv", "w")
+handle = File.open("data/op.csv", "w")
 handle.puts("CustomerID, OrderValue, Date, TransactionID, ProductID, Quantity")
 
 db.execute( "delete from spree_orders")
@@ -127,4 +127,3 @@ transactions.each do |t|
 end
 
 handle.close
-

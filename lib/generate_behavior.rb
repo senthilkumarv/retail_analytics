@@ -6,9 +6,7 @@ require './database'
 require 'uuid'
 require 'json'
 
-db = Database.create
-
-repository = SpreeRepository.new db
+repository = SpreeRepository.create
 uuid_generator = UUID.new
 
 def generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
@@ -70,9 +68,10 @@ def find_people_who_searched_and_bought_same_category(repository)
   repository.persist_substitution_behavior(valid_substitutions)
 end
 
-db.execute("delete from product_views")
-db.execute("delete from spree_user_behaviors")
-db.execute("delete from substitution_behavior")
+repository.delete_all_product_views
+repository.delete_all_user_behaviors
+repository.delete_all_substitution_behaviors
+
 generate_random_search_behavior_for_users(repository, uuid_generator, 30)
 generate_substitution_behavior_for_users(repository, uuid_generator)
 generate_purchase_behavior_for_purchased_product(repository, uuid_generator)
