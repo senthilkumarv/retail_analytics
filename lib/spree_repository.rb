@@ -128,7 +128,11 @@ class SpreeRepository
     end
 
     def purchase_count(variant)
-        query = "select count(*) from spree_line_items li inner join spree_user_behaviors ub on ub.parameters = '{\"order\": ' || li.order_id || '}' and ub.action = 'P' and li.variant_id = #{variant}"
+        query = <<-HERE
+            select count(*) from spree_line_items li
+                inner join spree_user_behaviors ub on ub.parameters = '{\"order\": ' || li.order_id || '}'
+                and ub.action = 'P' and li.variant_id = #{variant}
+        HERE
         @connection.execute(query)[0][0]
     end
 
